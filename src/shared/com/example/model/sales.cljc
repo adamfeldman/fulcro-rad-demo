@@ -3,22 +3,25 @@
  processing of a list of rows."
   (:require
     [com.fulcrologic.rad.attributes :refer [defattr]]
+    [com.fulcrologic.rad.attributes-options :as ao]
     [com.fulcrologic.rad.report :as report]
+    [com.fulcrologic.rad.report-options :as ro]
     [com.fulcrologic.guardrails.core :refer [>defn =>]]
     [com.wsscode.pathom.connect :as pc :refer [defresolver]]
     [com.fulcrologic.rad.type-support.decimal :as math]
     [com.fulcrologic.rad.ids :as ids]))
 
-(defattr date :sales/date :inst
-  {::report/column-heading "Date"})
+(defattr date :sales/date :instant
+  {ro/column-heading "Date"
+   ao/style          :date})
 
 (defattr revenue :sales/revenue :decimal
-  {::report/column-heading  "Revenue"
-   ::report/field-formatter (fn [report-instance v] (math/numeric->currency-str v))})
+  {ro/column-heading "Revenue"
+   ao/style          :USD})
 
 (defattr cost :sales/cost :decimal
-  {::report/column-heading  "Costs"
-   ::report/field-formatter (fn [report-instance v] (math/numeric->currency-str v))})
+  {ro/column-heading "Costs"
+   ao/style          :USD})
 
 (defattr row-index :sales/row-index :uuid
   {})
