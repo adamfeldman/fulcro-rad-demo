@@ -28,9 +28,8 @@
                      (update :addresses add (seed/new-address (new-uuid 1) "111 Main St."))
                      (update :addresses add (seed/new-address (new-uuid 300) "222 Other"))
                      (as-> d (update d :accounts add (seed/new-account (new-uuid 100) "Tony" "tony@example.com" "letmein"
-                                                                                  :account/addresses #{(get-in d [:addresses 0 :crux.db/id])
-                                                                                                       (get-in d [:addresses 1 :crux.db/id])}
-                                                                                  :account/primary-address (get-in d [:addresses 0 :crux.db/id])
+                                                                                  :account/addresses #{(get-in d [:addresses 0 :crux.db/id])}
+                                                                                  :account/primary-address (get-in d [:addresses 1 :crux.db/id])
                                                                                   :time-zone/zone-id :time-zone.zone-id/America-Los_Angeles)))
                      (update :accounts   add (seed/new-account (new-uuid 101) "Sam" "sam@example.com" "letmein"))
                      (update :accounts   add (seed/new-account (new-uuid 102) "Sally" "sally@example.com" "letmein"))
