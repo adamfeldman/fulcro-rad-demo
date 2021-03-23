@@ -6,4 +6,7 @@
 
 (defstate ^{:on-reload :noop} crux-nodes
   :start
-  (crux/start-databases (crux/symbolize-crux-modules config)))
+  (crux/start-databases (crux/symbolize-crux-modules config))
+  :stop
+  (for [node crux-nodes]
+    (.close node)))
