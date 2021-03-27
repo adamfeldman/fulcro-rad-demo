@@ -54,15 +54,10 @@
                                                                                               {:text (str name ", " email) :value [:account/id id]})
                                                                                             (sort-by :account/name options)))
                                          ::picker-options/cache-time-ms   30000}}
-   fo/subforms       {:invoice/line-items {::form/ui            LineItemForm
-                                           ::form/can-delete?   (fn [parent item] true)
-                                           ::form/can-add?      (fn [parent] true)
-                                           ::form/add-row-title "Add Item"
-                                           ;; Use computed props to inform subform of its role.
-                                           ::form/subform-style :inline}}
+   fo/subforms       {:invoice/line-items {fo/ui          LineItemForm
+                                           fo/can-delete? (fn [_ _] true)
+                                           fo/can-add?    (fn [_ _] true)}}
    fo/triggers       {:derive-fields (fn [new-form-tree] (sum-subtotals* new-form-tree))}
-
-   fo/cancel-route   ["landing-page"]
    fo/route-prefix   "invoice"
    fo/title          (fn [_ {:invoice/keys [id]}]
                        (if (tempid/tempid? id)
@@ -77,8 +72,9 @@
    ro/column-headings  {:invoice/id "Invoice Number"}
 
    ro/form-links       {:invoice/id InvoiceForm}
-   #_#_:com.fulcrologic.rad.control/controls {:account/id {:type  :uuid
-                                                           :label "Account"}}
+   ro/controls         {:account/id {:type   :uuid
+                                     :local? true
+                                     :label  "Account"}}
    ;; No control layout...we don't actually let the user control it
 
    ro/run-on-mount?    true

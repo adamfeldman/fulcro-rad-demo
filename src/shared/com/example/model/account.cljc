@@ -46,17 +46,20 @@
 (defattr password :password/hashed-value :string
   {ao/required?                                           true
    ao/identities                                          #{:account/id}
+   ::auth/permissions                                     (fn [_] #{})
    :com.fulcrologic.rad.database-adapters.sql/column-name "password"
    ao/schema                                              :production})
 
 (defattr password-salt :password/salt :string
   {:com.fulcrologic.rad.database-adapters.sql/column-name "password_salt"
+   ::auth/permissions                                     (fn [_] #{})
    ao/schema                                              :production
    ao/identities                                          #{:account/id}
    ao/required?                                           true})
 
 (defattr password-iterations :password/iterations :int
   {ao/identities                                          #{:account/id}
+   ::auth/permissions                                     (fn [_] #{})
    :com.fulcrologic.rad.database-adapters.sql/column-name "password_iterations"
    ao/schema                                              :production
    ao/required?                                           true})
@@ -134,6 +137,14 @@
                    #?(:clj
                       {:account/invoices (queries/get-customer-invoices env query-params)}))})
 
+#?(:clj
+   (defmutation logout [env _]
+     {}
+     (exauth/logout! env))
+   :cljs
+   (defmutation logout [_]
+     (remote [env]
+       true)))
 
 #?(:clj
    (defmutation login [env params]
@@ -200,4 +211,4 @@
                  addresses all-accounts avatar files account-invoices])
 
 #?(:clj
-   (def resolvers [login check-session set-account-active]))
+   (def resolvers [login logout check-session set-account-active]))

@@ -17,7 +17,18 @@
     [com.fulcrologic.rad.pathom :as pathom]
     [mount.core :refer [defstate]]
     [com.example.model.sales :as sales]
-    [com.example.model.item :as item]))
+    [com.example.model.item :as item]
+    [com.wsscode.pathom.core :as p]
+    [com.fulcrologic.rad.type-support.date-time :as dt]
+    [com.wsscode.pathom.connect :as pc]))
+
+(pc/defresolver index-explorer [{::pc/keys [indexes]} _]
+                {::pc/input  #{:com.wsscode.pathom.viz.index-explorer/id}
+                 ::pc/output [:com.wsscode.pathom.viz.index-explorer/index]}
+                {:com.wsscode.pathom.viz.index-explorer/index
+                 (p/transduce-maps
+                   (remove (comp #{::pc/resolve ::pc/mutate} key))
+                   indexes)})
 
 (defstate parser
   :start
@@ -26,7 +37,15 @@
      (form/pathom-plugin save/middleware delete/middleware)
      (datomic/pathom-plugin (fn [env] {:production (:main datomic-connections)}))
      (blob/pathom-plugin bs/temporary-blob-store {:files         bs/file-blob-store
-                                                  :avatar-images bs/image-blob-store})]
+                                                  :avatar-images bs/image-blob-store})
+     {::p/wrap-parser
+      (fn transform-parser-out-plugin-external [parser]
+        (fn transform-parser-out-plugin-internal [env tx]
+          ;; TASK: This should be taken from account-based setting
+          (dt/with-timezone "America/Los_Angeles"
+            (if (and (map? env) (seq tx))
+              (parser env tx)
+              {}))))}]
     [automatic-resolvers
      form/resolvers
      (blob/resolvers all-attributes)
@@ -34,4 +53,5 @@
      invoice/resolvers
      item/resolvers
      sales/resolvers
-     timezone/resolvers]))
+     timezone/resolvers
+     index-explorer]))
